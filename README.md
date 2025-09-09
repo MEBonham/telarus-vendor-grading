@@ -47,7 +47,7 @@ Here's how the weights are distributed across the 10 factors in the scoring mode
 
 # Next Steps
 
-1. Get the python function's deployment on Vercel working.
+1. Get the python function's deployment on Vercel working. Starting with figuring out why Vercel stopped recognizing my CI/CD pipeline connection when GitHub updates the repo.
 2. Add a way to dynamically adjust the weights.
 3. Ask for feedback!!!!
 4. 
