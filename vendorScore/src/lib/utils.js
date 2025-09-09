@@ -1,4 +1,4 @@
-const WEIGHTS = {
+export const WEIGHTS = {
     price: 0.15,
     costTransparency: 0.08,
     reliability: 0.15,
@@ -33,3 +33,9 @@ export const weightedGradeOutOf100 = (row) => {
         }, 0) * 100
     );
 }
+
+export const getCookieValue = (name) => {
+    return document.cookie.split('; ')
+        .find(row => row.startsWith(`${name}=`))
+        ?.split('=')[1];
+};
