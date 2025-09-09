@@ -1,57 +1,71 @@
 <script>
     import { Accordion } from "bits-ui";
-    import { weightedGradeOutOf100, getCookieValue } from "$lib/utils";
+    import { weightedGradeOutOf100 } from "$lib/utils";
 
     let vendorData = $state([]);
     $effect(() => {
         vendorData = JSON.parse(window.localStorage.getItem('vendorData'));
     });
+
     let vendorScores = $derived.by(() => {
         if (vendorData.length === 0) return {};
-
         return vendorData.slice(1).reduce((acc, row) => {
             acc[row[0]] = weightedGradeOutOf100([ ...row ]);
             return acc;
         }, {});
     });
+
     let sortedVendors = $derived(
         [ ...Object.keys(vendorScores) ].sort((a, b) => vendorScores[b] - vendorScores[a])
     );
 
     let vendorViewed = $state("");
     let explanation = $state("");
+    let isLoadingExplanation = $state(false);
+
     $effect(async () => {
-        if (vendorViewed === "") return;
-        const stored = window.localStorage.getItem(`telarus-explanations-${vendorViewed}`);
+        if (!vendorViewed) return;
+
+        explanation = "";
+        isLoadingExplanation = true;
+
+        const key = `telarus-explanations-${vendorViewed}`;
+        const stored = localStorage.getItem(key);
+
         if (stored) {
             explanation = stored;
-        } else {
-            // const response = await fetch("https://ai-proxy.vercel.app/api/ai_proxy", {
-            //     method: "POST",
-            //     headers: { "Content-Type": "application/json" },
-            //     body: JSON.stringify({
-            //         vendor: vendorViewed,
-            //         ratings: vendorData.find((row) => row[0] === vendorViewed).slice(1),
-            //         weights: WEIGHTS,
-            //         finalScore: vendorScores[vendorViewed],
-            //     }),
-            // });
+            isLoadingExplanation = false;
+            return;
+        }
 
-            // if (!response.ok) {
-            //     throw new Error(`Request failed: ${response.status}`);
-            // }
+        const vendorRow = vendorData.find((row) => row[0] === vendorViewed);
+        if (!vendorRow) {
+            explanation = "No data available for this vendor.";
+            isLoadingExplanation = false;
+            return;
+        }
 
-            throw new Promise((resolve) => {
-                const interval = setInterval(() => {
-                    const cookie = getCookieValue(vendorViewed);
-                    if (cookie) {
-                        localStorage.setItem(`telarus-explanations-${vendorViewed}`, cookie);
-                        explanation = cookie;
-                        clearInterval(interval);
-                        resolve();
-                    };
-                }, 1000);
+        try {
+            const response = await fetch("https://ai-proxy.vercel.app/api/ai_proxy", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    vendor: vendorViewed,
+                    ratings: vendorRow.slice(1),
+                    // optionally add weights if available
+                    finalScore: vendorScores[vendorViewed]
+                }),
             });
+
+            if (!response.ok) throw new Error(`Request failed: ${response.status}`);
+
+            const result = await response.text(); // or `.json()` depending on API
+            localStorage.setItem(key, result);
+            explanation = result;
+        } catch (e) {
+            explanation = "Failed to fetch explanation.";
+        } finally {
+            isLoadingExplanation = false;
         }
     });
 </script>
