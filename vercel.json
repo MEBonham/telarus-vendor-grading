@@ -1,5 +1,4 @@
 {
-  "rootDirectory": "vendorScore",
   "functions": {
     "api/**/*.py": {
       "runtime": "python3.11"
