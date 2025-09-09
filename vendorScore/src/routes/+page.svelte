@@ -1,6 +1,6 @@
 <script>
     import { Accordion } from "bits-ui";
-    import { weightedGradeOutOf100 } from "$lib/utils";
+    import { weightedGradeOutOf100, WEIGHTS } from "$lib/utils";
 
     let vendorData = $state([]);
     $effect(() => {
@@ -46,13 +46,13 @@
         }
 
         try {
-            const response = await fetch("https://ai-proxy.vercel.app/api/ai_proxy", {
+            const response = await fetch("/api/ai_proxy", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     vendor: vendorViewed,
                     ratings: vendorRow.slice(1),
-                    // optionally add weights if available
+                    weights: WEIGHTS,
                     finalScore: vendorScores[vendorViewed]
                 }),
             });
