@@ -1,7 +1,26 @@
 {
   "functions": {
     "api/*.py": {
-      "runtime": "python3.11"
+      "runtime": "python3.12"
     }
-  }
+  },
+  "builds": [
+    {
+      "src": "vendorScore/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "vendorScore/.svelte-kit"
+      }
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/vendorScore/$1"
+    }
+  ]
 }
