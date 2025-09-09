@@ -20,3 +20,9 @@
 11. Environmental impact (green energy, ethics)
 ~~12. (Integration ease) - probably too hard to measure~~
 
+# 1.3-Hour Check-In
+I have dummy data uploaded, and a consumer page where the star ratings for those vendors are processed and they are sorted by their final scores.
+
+I need to:
+- Make the full details of the scores and final-grade system display
+- Call an AI to get reasonable explanation summaries of the final grades.
